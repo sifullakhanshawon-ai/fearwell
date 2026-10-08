@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f766e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="বিদায় হিসাব" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="description" content="স্কুলের বিদায় অনুষ্ঠানের অনুদান ও খরচের হিসাব" />
+  <title>বিদায় অনুষ্ঠান - হিসাব</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #0d5f59;
+      --primary-light: #ccfbf1;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --bg: #f0fdfa;
+      --card: #ffffff;
+      --text: #134e4a;
+      --border: #99f6e4;
+      --shadow: 0 4px 20px rgba(15, 118, 110, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      background: linear-gradient(160deg, #f0fdfa 0%, #e0f2fe 50%, #f0fdfa 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(60px, env(safe-area-inset-bottom));
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 20px;
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, #0f766e, #0e7490);
+      border-radius: 20px;
+      color: white;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+      position: relative;
+    }
+
+    .edit-title {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 12px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .edit-title:hover { background: rgba(255,255,255,0.3); }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px 14px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+
+    .card:hover { transform: translateY(-2px); }
+
+    .card .label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .card .amount {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .card.income .amount { color: var(--success); }
+    .card.expense .amount { color: var(--danger); }
+    .card.balance .amount { color: var(--primary); }
+
+    .card .icon { font-size: 1.4rem; margin-bottom: 4px; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 6px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 10px rgba(15, 118, 110, 0.3);
+    }
+
+    .form-section, .list-section {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .form-section h3, .list-section h3 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-group { margin-bottom: 12px; }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #475569;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #f8fafc;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+      background: white;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: var(--danger-light);
+      color: var(--danger);
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    .btn-danger:hover { background: #fecaca; }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover { background: #e2e8f0; }
+
+    .btn-save {
+      background: var(--success);
+      color: white;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      width: auto;
+    }
+
+    .btn-save:hover { background: #15803d; }
+
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 10px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .amount-cell { font-weight: 600; white-space: nowrap; }
+    .amount-cell.income { color: var(--success); }
+    .amount-cell.expense { color: var(--danger); }
+
+    .amount-input {
+      width: 110px;
+      padding: 8px 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      text-align: right;
+      background: #f8fafc;
+    }
+
+    .amount-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+      background: white;
+    }
+
+    .amount-input.has-value {
+      border-color: var(--success);
+      background: var(--success-light);
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-state .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .modal h3 { margin-bottom: 12px; color: var(--primary); }
+    .modal p { margin-bottom: 20px; color: #64748b; }
+
+    .modal-btns { display: flex; gap: 10px; }
+    .modal-btns .btn { flex: 1; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #134e4a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .search-box {
+      margin-bottom: 16px;
+    }
+
+    .search-box input {
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .paid-badge {
+      display: inline-block;
+      background: var(--success-light);
+      color: var(--success);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .unpaid-badge {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .stat-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    .stat-bar span strong { color: var(--primary); }
+
+    .hidden { display: none !important; }
+
+    .note {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.35rem; }
+      .summary { grid-template-columns: 1fr; gap: 10px; }
+      .card .amount { font-size: 1.3rem; }
+      .form-row { grid-template-columns: 1fr; }
+      th, td { padding: 10px 8px; font-size: 0.88rem; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+      .amount-input { width: 90px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="siteTitle">বিদায় অনুষ্ঠান - হিসাব</h1>
+      <p id="siteSubtitle">অনুদান ও খরচের স্বচ্ছ হিসাব</p>
+      <span class="edit-title" onclick="editTitle()">✏️ নাম পরিবর্তন</span>
+    </header>
+
+    <!-- Summary -->
+    <div class="summary">
+      <div class="card income">
+        <div class="icon">💰</div>
+        <div class="label">মোট অনুদান</div>
+        <div class="amount" id="totalIncome">৳ ০</div>
+      </div>
+      <div class="card expense">
+        <div class="icon">🧾</div>
+        <div class="label">মোট খরচ</div>
+        <div class="amount" id="totalExpense">৳ ০</div>
+      </div>
+      <div class="card balance">
+        <div class="icon">📊</div>
+        <div class="label">অবশিষ্ট</div>
+        <div class="amount" id="balance">৳ ০</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="donation" onclick="switchTab('donation')">শিক্ষার্থীদের অনুদান</button>
+      <button class="tab-btn" data-tab="expense" onclick="switchTab('expense')">খরচ</button>
+    </div>
+
+    <!-- Donation Tab -->
+    <div id="donationTab">
+      <div class="list-section">
+        <h3>
+          <span>শিক্ষার্থীদের তালিকা</span>
+          <button class="btn btn-save" onclick="saveAllAmounts()">💾 সব সেভ করুন</button>
+        </h3>
+
+        <div class="stat-bar">
+          <span>মোট শিক্ষার্থী: <strong id="totalStudents">৬০</strong></span>
+          <span>টাকা দিয়েছে: <strong id="paidCount">০</strong></span>
+          <span>এখনো দেয়নি: <strong id="unpaidCount">৬০</strong></span>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="নাম দিয়ে খুঁজুন..." oninput="filterStudents()" />
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>নাম</th>
+                <th>টাকার পরিমাণ (৳)</th>
+                <th>স্ট্যাটাস</th>
+              </tr>
+            </thead>
+            <tbody id="studentList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expense Tab -->
+    <div id="expenseTab" class="hidden">
+      <div class="form-section">
+        <h3>➕ নতুন খরচ যোগ করুন</h3>
+        <form id="expenseForm" onsubmit="addExpense(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>কীতে খরচ *</label>
+              <input type="text" id="eItem" placeholder="যেমন: কেক, সাউন্ড সিস্টেম" required />
+            </div>
+            <div class="form-group">
+              <label>টাকার পরিমাণ (৳) *</label>
+              <input type="number" id="eAmount" placeholder="যেমন: ২০০০" min="1" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>তারিখ</label>
+              <input type="date" id="eDate" />
+            </div>
+            <div class="form-group">
+              <label>মন্তব্য (ঐচ্ছিক)</label>
+              <input type="text" id="eNote" placeholder="যেমন: দোকান থেকে কেনা" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">যোগ করুন</button>
+        </form>
+      </div>
+
+      <div class="list-section">
+        <h3>
+          <span>খরচের তালিকা</span>
+          <span id="expenseCount" style="font-size:0.85rem;color:#64748b;font-weight:500"></span>
+        </h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>খরচের বিবরণ</th>
+                <th>পরিমাণ</th>
+                <th>তারিখ</th>
+                <th>মন্তব্য</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="expenseList"></tbody>
+          </table>
+        </div>
+        <div id="expenseEmpty" class="empty-state">
+          <div class="emoji">📭</div>
+          <div>এখনো কোনো খরচ যোগ করা হয়নি</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-primary" id="installBtn" onclick="installApp()" style="display:none; width:auto; background:#0e7490;">
+        📱 অ্যাপ হিসেবে ইনস্টল করুন
+      </button>
+      <button class="btn btn-secondary" onclick="exportData()">📥 ডেটা ডাউনলোড (JSON)</button>
+      <button class="btn btn-secondary" onclick="printReport()">🖨️ প্রিন্ট / PDF</button>
+      <button class="btn btn-secondary" style="color:#dc2626" onclick="confirmClear()">🗑️ খরচ মুছে ফেলুন</button>
+    </div>
+
+    <p class="note">
+      * টাকার পরিমাণ লিখে "সব সেভ করুন" বাটনে চাপুন। ডেটা আপনার ব্রাউজারে সেভ থাকে।
+    </p>
+  </div>
+
+  <!-- Clear Confirm Modal -->
+  <div class="modal-overlay" id="clearModal">
+    <div class="modal">
+      <h3>⚠️ নিশ্চিত করুন</h3>
+      <p>সব খরচের তথ্য মুছে যাবে। শিক্ষার্থীদের অনুদানের তথ্য থাকবে। আপনি কি নিশ্চিত?</p>
+      <div class="modal-btns">
+        <button class="btn btn-secondary" onclick="closeModal()">না, রাখুন</button>
+        <button class="btn btn-primary" style="background:#dc2626" onclick="clearExpenses()">হ্যাঁ, মুছে ফেলুন</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== Student Names (correct serial) ==========
+    const studentNames = [
+      "শান্ত",
+      "সামিউল",
+      "সাইফুল্লাহ",
+      "সাকিবুল",
+      "রুহুল",
+      "নাঈম",
+      "হামিম",
+      "সোহেল",
+      "রুবাইয়াত",
+      "ওমর",
+      "রবিউল",
+      "সিয়াম",
+      "ওমর লক্ষীপুর",
+      "হুসাইন",
+      "মঞ্জিল",
+      "নাসিম",
+      "কাহার",
+      "জীবন",
+      "জাকারিয়া",
+      "রহিম",
+      "নাহিদ",
+      "শিমুল",
+      "আহাদ",
+      "আলিফ",
+      "রিয়াদ",
+      "সোহান",
+      "জিহাদ",
+      "আমিন",
+      "শাকিল",
+      "রিফাত",
+      "আতিক",
+      "ইমন",
+      "সাফিউল্লাহ",
+      "সোহেল চান্দাই",
+      "তুষার",
+      "সাইমুন",
+      "হৃদয়",
+      "সজীবুল",
+      "সিয়াম",
+      "নাঈম",
+      "তাওহীদ",
+      "মুরাদ",
+      "শামীম",
+      "ইমরান",
+      "রোহান",
+      "মোশারফ",
+      "সাগর",
+      "সোহান",
+      "রাসেল",
+      "পিয়াস",
+      "আসিফ",
+      "মারুফ",
+      "সৌরভ",
+      "জুবায়ের",
+      "মেহেদী",
+      "জুবায়ের",
+      "আরাফাত",
+      "সাদ",
+      "খাইরুন",
+      "সোহান"
+    ];
+
+    // ========== Data ==========
+    let expenses = JSON.parse(localStorage.getItem('farewell_expenses') || '[]');
+    let siteTitle = localStorage.getItem('farewell_title') || 'বিদায় অনুষ্ঠান - হিসাব';
+    let siteSubtitle = localStorage.getItem('farewell_subtitle') || 'অনুদান ও খরচের স্বচ্ছ হিসাব';
+
+    // Always use correct names; preserve amounts from previous save if any
+    let students = studentNames.map((name, i) => ({
+      id: i + 1,
+      name: name,
+      amount: 0
+    }));
+    const oldStudents = JSON.parse(localStorage.getItem('farewell_students') || '[]');
+    if (oldStudents.length) {
+      oldStudents.forEach(o => {
+        const s = students.find(st => st.id === o.id);
+        if (s) s.amount = o.amount || 0;
+      });
+    }
+    saveStudents();
+
+    // ========== Init ==========
+    document.getElementById('siteTitle').textContent = siteTitle;
+    document.getElementById('siteSubtitle').textContent = siteSubtitle;
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('eDate').value = today;
+
+    renderAll();
+
+    // ========== Tab Switch ==========
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      document.getElementById('donationTab').classList.toggle('hidden', tab !== 'donation');
+      document.getElementById('expenseTab').classList.toggle('hidden', tab !== 'expense');
+    }
+
+    // ========== Students ==========
+    function renderStudents(filter = '') {
+      const tbody = document.getElementById('studentList');
+      const q = filter.trim().toLowerCase();
+
+      let list = students;
+      if (q) {
+        list = students.filter(s => s.name.toLowerCase().includes(q) || String(s.id).includes(q));
+      }
+
+      tbody.innerHTML = list.map(s => `
+        <tr data-id="${s.id}">
+          <td>${s.id}</td>
+          <td><strong>${escapeHtml(s.name)}</strong></td>
+          <td>
+            <input type="number" 
+                   class="amount-input ${s.amount > 0 ? 'has-value' : ''}" 
+                   data-id="${s.id}" 
+                   value="${s.amount || ''}" 
+                   placeholder="০" 
+                   min="0"
+                   onchange="updateAmount(${s.id}, this.value)"
+                   oninput="this.classList.toggle('has-value', this.value > 0)" />
+          </td>
+          <td>
+            ${s.amount > 0 
+              ? '<span class="paid-badge">দিয়েছে</span>' 
+              : '<span class="unpaid-badge">বাকি</span>'}
+          </td>
+        </tr>
+      `).join('');
+
+      updatePaidStats();
+    }
+
+    function updateAmount(id, value) {
+      const s = students.find(st => st.id === id);
+      if (s) {
+        s.amount = parseFloat(value) || 0;
+        // Auto save on change
+        saveStudents();
+        renderSummary();
+        updatePaidStats();
+      }
+    }
+
+    function saveAllAmounts() {
+      // Collect all current input values
+      document.querySelectorAll('.amount-input').forEach(input => {
+        const id = parseInt(input.dataset.id);
+        const s = students.find(st => st.id === id);
+        if (s) s.amount = parseFloat(input.value) || 0;
+      });
+      saveStudents();
+      renderStudents(document.getElementById('searchInput').value);
+      renderSummary();
+      showToast('সব অনুদান সেভ হয়েছে ✓');
+    }
+
+    function filterStudents() {
+      renderStudents(document.getElementById('searchInput').value);
+    }
+
+    function updatePaidStats() {
+      const paid = students.filter(s => s.amount > 0).length;
+      document.getElementById('paidCount').textContent = toBanglaNum(paid);
+      document.getElementById('unpaidCount').textContent = toBanglaNum(60 - paid);
+    }
+
+    function saveStudents() {
+      localStorage.setItem('farewell_students', JSON.stringify(students));
+    }
+
+    // ========== Expense ==========
+    function addExpense(e) {
+      e.preventDefault();
+      const item = document.getElementById('eItem').value.trim();
+      const amount = parseFloat(document.getElementById('eAmount').value);
+      const date = document.getElementById('eDate').value || today;
+      const note = document.getElementById('eNote').value.trim();
+
+      if (!item || !amount || amount <= 0) {
+        showToast('সঠিক তথ্য দিন');
+        return;
+      }
+
+      expenses.push({ id: Date.now(), item, amount, date, note });
+      saveExpenses();
+      document.getElementById('expenseForm').reset();
+      document.getElementById('eDate').value = today;
+      showToast('খরচ যোগ হয়েছে ✓');
+      renderExpenses();
+      renderSummary();
+    }
+
+    function deleteExpense(id) {
+      expenses = expenses.filter(e => e.id !== id);
+      saveExpenses();
+      showToast('মুছে ফেলা হয়েছে');
+      renderExpenses();
+      renderSummary();
+    }
+
+    function saveExpenses() {
+      localStorage.setItem('farewell_expenses', JSON.stringify(expenses));
+    }
+
+    function renderExpenses() {
+      const tbody = document.getElementById('expenseList');
+      const empty = document.getElementById('expenseEmpty');
+      const count = document.getElementById('expenseCount');
+
+      count.textContent = expenses.length ? `(${toBanglaNum(expenses.length)} টি)` : '';
+
+      if (expenses.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      const sorted = [...expenses].sort((a, b) => b.id - a.id);
+
+      tbody.innerHTML = sorted.map((e, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><strong>${escapeHtml(e.item)}</strong></td>
+          <td class="amount-cell expense">${formatMoney(e.amount)}</td>
+          <td>${formatDate(e.date)}</td>
+          <td>${escapeHtml(e.note || '—')}</td>
+          <td><button class="btn btn-danger" onclick="deleteExpense(${e.id})">মুছুন</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // ========== Summary ==========
+    function renderSummary() {
+      const totalIn = students.reduce((s, d) => s + (d.amount || 0), 0);
+      const totalEx = expenses.reduce((s, e) => s + e.amount, 0);
+      const bal = totalIn - totalEx;
+
+      document.getElementById('totalIncome').textContent = formatMoney(totalIn);
+      document.getElementById('totalExpense').textContent = formatMoney(totalEx);
+      document.getElementById('balance').textContent = formatMoney(bal);
+    }
+
+    function renderAll() {
+      renderStudents();
+      renderExpenses();
+      renderSummary();
+    }
+
+    // ========== Helpers ==========
+    function formatMoney(n) {
+      return '৳ ' + Number(n).toLocaleString('bn-BD');
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      const [y, m, day] = d.split('-');
+      return `${day}/${m}/${y}`;
+    }
+
+    function toBanglaNum(n) {
+      return String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // ========== Title Edit ==========
+    function editTitle() {
+      const newTitle = prompt('ওয়েবসাইটের নাম লিখুন:', siteTitle);
+      if (newTitle !== null && newTitle.trim()) {
+        siteTitle = newTitle.trim();
+        localStorage.setItem('farewell_title', siteTitle);
+        document.getElementById('siteTitle').textContent = siteTitle;
+      }
+      const newSub = prompt('সাবটাইটেল লিখুন (ঐচ্ছিক):', siteSubtitle);
+      if (newSub !== null) {
+        siteSubtitle = newSub.trim() || 'অনুদান ও খরচের স্বচ্ছ হিসাব';
+        localStorage.setItem('farewell_subtitle', siteSubtitle);
+        document.getElementById('siteSubtitle').textContent = siteSubtitle;
+      }
+    }
+
+    // ========== Clear Expenses ==========
+    function confirmClear() {
+      document.getElementById('clearModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('clearModal').classList.remove('show');
+    }
+
+    function clearExpenses() {
+      expenses = [];
+      saveExpenses();
+      closeModal();
+      showToast('সব খরচ মুছে ফেলা হয়েছে');
+      renderExpenses();
+      renderSummary();
+    }
+
+    // ========== Export ==========
+    function exportData() {
+      const data = {
+        title: siteTitle,
+        subtitle: siteSubtitle,
+        exportedAt: new Date().toISOString(),
+        students,
+        expenses,
+        summary: {
+          totalIncome: students.reduce((s, d) => s + (d.amount || 0), 0),
+          totalExpense: expenses.reduce((s, e) => s + e.amount, 0)
+        }
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bidoy-anusthan-hisab-${today}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('ডাউনলোড শুরু হয়েছে');
+    }
+
+    // ========== Print ==========
+    function printReport() {
+      const totalIn = students.reduce((s, d) => s + (d.amount || 0), 0);
+      const totalEx = expenses.reduce((s, e) => s + e.amount, 0);
+      const bal = totalIn - totalEx;
+      const paid = students.filter(s => s.amount > 0);
+
+      let html = `
+        <html><head>
+          <title>${siteTitle}</title>
+          <style>
+            body { font-family: 'Noto Sans Bengali', Arial, sans-serif; padding: 30px; color: #134e4a; }
+            h1 { text-align: center; margin-bottom: 4px; }
+            .sub { text-align: center; color: #64748b; margin-bottom: 24px; }
+            .summary { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+            .box { border: 2px solid #0f766e; border-radius: 10px; padding: 12px 24px; text-align: center; }
+            .box strong { display: block; font-size: 1.3rem; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 0.9rem; }
+            th, td { border: 1px solid #99f6e4; padding: 6px 10px; text-align: left; }
+            th { background: #ccfbf1; }
+            h2 { color: #0f766e; margin: 20px 0 10px; font-size: 1.15rem; }
+            .footer { text-align: center; margin-top: 30px; font-size: 0.85rem; color: #94a3b8; }
+          </style>
+        </head><body>
+          <h1>${siteTitle}</h1>
+          <p class="sub">${siteSubtitle}</p>
+          <div class="summary">
+            <div class="box">মোট অনুদান<strong>৳ ${totalIn.toLocaleString('bn-BD')}</strong></div>
+            <div class="box">মোট খরচ<strong>৳ ${totalEx.toLocaleString('bn-BD')}</strong></div>
+            <div class="box">অবশিষ্ট<strong>৳ ${bal.toLocaleString('bn-BD')}</strong></div>
+          </div>
+      `;
+
+      html += `<h2>অনুদান দিয়েছে (${paid.length} জন)</h2>`;
+      if (paid.length) {
+        html += `<table><thead><tr><th>#</th><th>নাম</th><th>পরিমাণ</th></tr></thead><tbody>`;
+        paid.forEach(s => {
+          html += `<tr><td>${s.id}</td><td>${escapeHtml(s.name)}</td><td>৳ ${s.amount.toLocaleString('bn-BD')}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      } else {
+        html += `<p>এখনো কেউ টাকা দেয়নি।</p>`;
+      }
+
+      // Unpaid list
+      const unpaid = students.filter(s => !s.amount || s.amount === 0);
+      if (unpaid.length) {
+        html += `<h2>এখনো দেয়নি (${unpaid.length} জন)</h2>`;
+        html += `<p>${unpaid.map(s => s.name).join(', ')}</p>`;
+      }
+
+      if (expenses.length) {
+        html += `<h2>খরচের তালিকা (${expenses.length} টি)</h2><table><thead><tr><th>#</th><th>বিবরণ</th><th>পরিমাণ</th><th>তারিখ</th><th>মন্তব্য</th></tr></thead><tbody>`;
+        [...expenses].sort((a,b)=>b.id-a.id).forEach((e,i) => {
+          html += `<tr><td>${i+1}</td><td>${escapeHtml(e.item)}</td><td>৳ ${e.amount.toLocaleString('bn-BD')}</td><td>${formatDate(e.date)}</td><td>${escapeHtml(e.note||'')}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      html += `<div class="footer">প্রিন্ট করা হয়েছে: ${new Date().toLocaleString('bn-BD')}</div></body></html>`;
+
+      const win = window.open('', '_blank');
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 400);
+    }
+
+    // ========== PWA Install ==========
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('installBtn');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+
+    function installApp() {
+      if (!deferredPrompt) {
+        showToast('ইতিমধ্যে ইনস্টল করা আছে অথবা সাপোর্ট করে না');
+        return;
+      }
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((result) => {
+        if (result.outcome === 'accepted') {
+          showToast('অ্যাপ ইনস্টল হয়েছে! ✓');
+        }
+        deferredPrompt = null;
+        const btn = document.getElementById('installBtn');
+        if (btn) btn.style.display = 'none';
+      });
+    }
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
